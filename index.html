@@ -1,1 +1,170 @@
-<h1>Hello World Wide Web!</h1>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/p5@2.3.4/lib/p5.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/p5.sound@0.4.1/dist/p5.sound.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta charset="utf-8" />
+
+  </head>
+  <body>
+    <main>
+    </main>
+  </body>
+</html>
+
+<script>
+let x, y; // current cursor position
+let px, py; // previous cursor position
+let music = false;
+let soup_color;
+let osc, fft, envelope;
+let amp;
+let tube_color = '#889FB3';
+let wall_shade = '#FCE7D2';
+let red_color = '#FF4D4D';
+let green_color = '#70DB76';
+let blue_color = '#80A8FF';
+
+// Used to  detect button presses only once
+function setup(){
+  createCanvas(800,1200);
+  background ('#FFF1E8');
+  
+  x = width/2;
+  y = height/2;
+  px = x;
+  py = y;
+  
+  textAlign(CENTER,CENTER);
+  soup_color = '#F2FFFF';
+  
+  envelope = new p5.Envelope();
+  fft = new p5.FFT(32);
+  osc = new p5.TriOsc(440);
+  osc.connect(envelope);
+  
+}
+
+function draw(){
+  
+  
+  background ('#FFF1E8');
+  
+  noStroke();
+  
+  fill(wall_shade);
+  rect(75,0,150,350);
+  rect(300,0,150,350);
+  rect(525,0,150,350);
+  
+  
+  fill('#DEBEE8'); // pastel purple
+  rect(0,900,850,600);
+  
+  fill(tube_color);
+  rect(100,0,150,350);
+  fill(red_color);
+  circle(175,175,75);
+  
+  fill(tube_color);
+  rect(325,0,150,350);
+  fill(green_color);
+  circle(400,175,75);
+  
+  fill(tube_color);
+  rect(550,0,150,350);
+  fill(blue_color);
+  circle(625,175,75);
+  
+  fill('#A36149');
+  rect(x,y-75,20,100);
+  
+  fill('#C195CF'); // pastel purple shade
+  quad(250,1000,550,1000,450,1175,50,1175);
+  
+  fill('#A5BED1');
+  quad(200,800,250,1000,550,1000,600,800,600,800);
+  
+  fill(soup_color);
+  quad(225,800,250,810,550,810,575,800,600,800);
+  
+  // 
+  let gp = navigator.getGamepads()[0];
+  if(!gp){
+    fill(0);
+    noStroke();
+    textSize(24);
+    text("(੭*ˊᵕˋ)੭*", width/2,900);
+    return;
+  
+  }
+  
+  
+  //left joystick 
+  let deadzone = 0.15;
+   let dx = abs(gp.axes[0]) > deadzone ? gp.axes[0] : 0;
+  let dy = abs(gp.axes[1]) > deadzone ? gp.axes[1] : 0;
+  
+  let speed = 8;
+  px = x; 
+  py = y;
+  
+  x += dx * speed; 
+  y += dy * speed;
+  
+  x = constrain(x, 210 , 570);
+  y = constrain(y, 800 , 800);
+  
+  freq = constrain(map(x, 210, 570, 100, 500), 100, 500); // pitch mapped to curr x position
+  amp = 0.1; // volume
+  
+  if (px === x){
+    osc.start();
+    music = true;
+  }
+  else{
+    osc.amp(0, 0.1);
+    osc.freq(freq, 0.1);
+    music = false;
+  }
+  
+  handleButtons(gp);
+}
+
+function handleButtons(gp){
+
+  if(gp.buttons[0].pressed){
+
+    osc.amp(0.2);
+    soup_color = red_color;
+  }
+  
+  if(gp.buttons[1].pressed){
+    osc.amp(0.3);
+    soup_color = green_color;
+  }
+  if(gp.buttons[2].pressed){
+    osc.amp(0.5);
+    soup_color = blue_color;
+  }
+  drip(soup_color);
+}
+  
+function drip(hue){
+
+  if(hue === red_color){
+    fill(red_color);
+    rect(225,350,15,450);
+  }
+  if(hue === green_color){
+    fill(green_color);
+    rect(400,350,15,450);
+  }
+  if(hue === blue_color){
+    fill(blue_color);
+    rect(565,350,15,450);
+  }
+}
+  
+</script>
